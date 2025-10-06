@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Medicamentos</title>
+</h:head>
+<h:body>
+
+<!-- Formulário principal da listagem de medicamentos -->
+<h:form id="formLista">
+    <p:growl id="growl" showDetail="true" life="3000"/>
+
+    <!-- Atalhos de navegação -->
+    <p:button value="Menu Principal" icon="pi pi-home" outcome="/index.xhtml" styleClass="ui-button-secondary"/>
+    <p:spacer width="8"/>
+
+    <!-- Botão para abrir o diálogo de novo cadastro -->
+    <p:commandButton value="Novo Medicamento" icon="pi pi-plus" styleClass="ui-button-success"
+                     actionListener="#{medicamentoBean.prepararNovo}"
+                     update=":formDialog" oncomplete="PF('dlgMedicamento').show()"/>
+
+    <!-- Tabela com paginação lazy, filtro por Nome e ações de editar/excluir -->
+    <p:dataTable id="tabela" value="#{medicamentoBean.lazyModel}" var="m" lazy="true"
+                 paginator="true" rows="5" rowsPerPageTemplate="5,10,20,50"
+                 selectionMode="single" rowKey="#{m.id}" currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords}"
+                 emptyMessage="Nenhum registro encontrado">
+
+        <p:column headerText="Nome" sortBy="#{m.nome}" filterBy="#{m.nome}" filterMatchMode="contains">
+            <h:outputText value="#{m.nome}"/>
+        </p:column>
+
+        <p:column headerText="Ações" style="width:160px; text-align:center;">
+            <p:commandButton icon="pi pi-pencil" title="Editar" styleClass="ui-button-info ui-button-flat"
+                             actionListener="#{medicamentoBean.prepararEdicao(m)}"
+                             update=":formDialog" oncomplete="PF('dlgMedicamento').show()"/>
+            <p:commandButton icon="pi pi-trash" title="Excluir" styleClass="ui-button-danger ui-button-flat"
+                             actionListener="#{medicamentoBean.excluir(m.id)}" update=":formLista:tabela :formLista:growl"
+                             process="@this">
+                <p:confirm header="Confirmação" message="Deseja excluir este medicamento?" icon="pi pi-exclamation-triangle"/>
+            </p:commandButton>
+        </p:column>
+
+    </p:dataTable>
+</h:form>
+
+<!-- Diálogo de cadastro/edição de medicamento -->
+<p:dialog id="dialog" header="Cadastro de Medicamento" widgetVar="dlgMedicamento" modal="true" closable="true" resizable="false" width="450">
+    <h:form id="formDialog">
+        <p:growl id="msgs" showDetail="false" life="3000" severity="error"/>
+        <h:panelGrid columns="2" columnClasses="label,value" cellpadding="5">
+            <h:outputLabel for="nome" value="Nome:"/>
+            <p:inputText id="nome" value="#{medicamentoBean.medicamento.nome}" required="true" maxlength="150"/>
+        </h:panelGrid>
+        <p:separator/>
+        <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{medicamentoBean.salvar}"
+                         update=":formLista:tabela :formDialog:msgs"/>
+        <p:commandButton value="Cancelar" icon="pi pi-times" type="button" onclick="PF('dlgMedicamento').hide()"/>
+    </h:form>
+</p:dialog>
+
+<!-- Diálogo de confirmação global para exclusões -->
+<h:form id="confirmForm">
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+    </p:confirmDialog>
+</h:form>
+
+</h:body>
+</html>

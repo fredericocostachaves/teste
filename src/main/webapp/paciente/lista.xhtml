@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Pacientes</title>
+</h:head>
+<h:body>
+
+<!-- Formulário principal da listagem de pacientes -->
+<h:form id="formLista">
+    <p:growl id="growl" showDetail="true" life="3000"/>
+
+    <!-- Atalhos de navegação -->
+    <p:button value="Menu Principal" icon="pi pi-home" outcome="/index.xhtml" styleClass="ui-button-secondary"/>
+    <p:spacer width="8"/>
+    
+    <!-- Botão para abrir o diálogo de novo cadastro -->
+    <p:commandButton value="Novo Paciente" icon="pi pi-plus" styleClass="ui-button-success"
+                     actionListener="#{pacienteBean.prepararNovo}"
+                     update=":formDialog" oncomplete="PF('dlgPaciente').show()"/>
+
+    <!-- Tabela com paginação lazy, filtros por Nome e CPF e ações de editar/excluir -->
+    <p:dataTable id="tabela" value="#{pacienteBean.lazyModel}" var="p" lazy="true"
+                 paginator="true" rows="5" rowsPerPageTemplate="5,10,20,50"
+                 selectionMode="single" rowKey="#{p.id}" currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords}"
+                 emptyMessage="Nenhum registro encontrado">
+
+        <p:column headerText="Nome" sortBy="#{p.nome}" filterBy="#{p.nome}" filterMatchMode="contains">
+            <h:outputText value="#{p.nome}"/>
+        </p:column>
+
+        <p:column headerText="CPF" sortBy="#{p.cpf}" filterBy="#{p.cpf}" filterMatchMode="contains">
+            <h:outputText value="#{p.cpf}"/>
+        </p:column>
+
+        <p:column headerText="Ações" style="width:160px; text-align:center;">
+            <p:commandButton icon="pi pi-pencil" title="Editar" styleClass="ui-button-info ui-button-flat"
+                             actionListener="#{pacienteBean.prepararEdicao(p)}"
+                             update=":formDialog" oncomplete="PF('dlgPaciente').show()"/>
+            <p:commandButton icon="pi pi-trash" title="Excluir" styleClass="ui-button-danger ui-button-flat"
+                             actionListener="#{pacienteBean.excluir(p.id)}" update=":formLista:tabela :formLista:growl"
+                             process="@this">
+                <p:confirm header="Confirmação" message="Deseja excluir este paciente?" icon="pi pi-exclamation-triangle"/>
+            </p:commandButton>
+        </p:column>
+
+    </p:dataTable>
+</h:form>
+
+<!-- Diálogo de cadastro/edição de paciente -->
+<p:dialog id="dialog" header="Cadastro de Paciente" widgetVar="dlgPaciente" modal="true" closable="true" resizable="false" width="450">
+    <h:form id="formDialog">
+        <p:growl id="msgs" showDetail="false" life="3000" severity="error"/>
+        <h:panelGrid columns="2" columnClasses="label,value" cellpadding="5">
+            <h:outputLabel for="nome" value="Nome:"/>
+            <p:inputText id="nome" value="#{pacienteBean.paciente.nome}" required="true" maxlength="150"/>
+
+            <h:outputLabel for="cpf" value="CPF:"/>
+            <p:inputMask id="cpf" value="#{pacienteBean.paciente.cpf}" mask="999.999.999-99" required="true"/>
+        </h:panelGrid>
+        <p:separator/>
+        <p:commandButton value="Salvar" icon="pi pi-check" actionListener="#{pacienteBean.salvar}"
+                         update=":formLista:tabela :formDialog:msgs"/>
+        <p:commandButton value="Cancelar" icon="pi pi-times" type="button" onclick="PF('dlgPaciente').hide()"/>
+    </h:form>
+</p:dialog>
+
+<!-- Diálogo de confirmação global para exclusões -->
+<h:form id="confirmForm">
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+    </p:confirmDialog>
+</h:form>
+
+</h:body>
+</html>

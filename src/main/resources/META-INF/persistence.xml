@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+    <persistence-unit name="testePU" transaction-type="JTA">
+        <jta-data-source>java:/PostgresDS</jta-data-source>
+
+        <class>br.com.teste.model.Paciente</class>
+        <class>br.com.teste.model.Medicamento</class>
+        <class>br.com.teste.model.Receita</class>
+        <class>br.com.teste.model.MedicamentoReceitado</class>
+
+        <properties>
+            <!-- Dialeto do Hibernate para PostgreSQL -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <!-- Estratégia de geração do esquema. Use 'update' apenas em desenvolvimento. -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!-- Exibir SQL gerado no log (false recomendado em produção) -->
+            <property name="hibernate.show_sql" value="false"/>
+            <!-- Formatar o SQL para facilitar leitura no log -->
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
