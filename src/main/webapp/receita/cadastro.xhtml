@@ -5,6 +5,7 @@
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <title>Receita Médica - Associação de Medicamentos</title>
+    <h:outputStylesheet library="primefaces" name="primeicons/primeicons.css"/>
 </h:head>
 <h:body>
 
@@ -28,7 +29,7 @@
             <f:selectItems value="#{receitaBean.pacientes}" var="p" itemValue="#{p.id}" itemLabel="#{p.nome} (ID: #{p.id})"/>
         </p:selectOneMenu>
         <p:commandButton value="Criar Receita" icon="pi pi-plus" actionListener="#{receitaBean.criarNovaReceita}"
-                         update=":formReceita:growl :formReceita:painelItens"/>
+                         update=":formReceita"/>
     </h:panelGrid>
 
     <p:separator/>

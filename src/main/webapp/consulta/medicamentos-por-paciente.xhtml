@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Consulta - Medicamentos por Paciente</title>
+    <h:outputStylesheet library="primefaces" name="primeicons/primeicons.css"/>
+</h:head>
+<h:body>
+
+<h:form id="formConsulta">
+    <p:growl id="growl" showDetail="true" life="3000"/>
+
+    <!-- Navegação -->
+    <p:button value="Menu Principal" icon="pi pi-home" outcome="/index.xhtml" styleClass="ui-button-secondary"/>
+    <p:spacer width="10"/>
+
+    <h3>Filtros de Pesquisa</h3>
+    <div class="ui-fluid">
+        <div class="ui-g">
+            <div class="ui-g-12 ui-md-4">
+                <p:outputLabel for="paciente" value="Paciente (nome contém)"/>
+                <p:inputText id="paciente" value="#{consultaMedicamentosBean.pacienteNomeFiltro}"/>
+            </div>
+            <div class="ui-g-12 ui-md-4">
+                <p:outputLabel for="medicamento" value="Medicamento (nome contém)"/>
+                <p:inputText id="medicamento" value="#{consultaMedicamentosBean.medicamentoNomeFiltro}"/>
+            </div>
+            <div class="ui-g-12 ui-md-4" style="padding-top:22px;">
+                <p:commandButton value="Pesquisar" icon="pi pi-search"
+                                 actionListener="#{consultaMedicamentosBean.pesquisar}"
+                                 update=":formConsulta:tabela :formConsulta:growl"/>
+                <p:commandButton value="Limpar" icon="pi pi-times" styleClass="ui-button-secondary"
+                                 actionListener="#{consultaMedicamentosBean.limpar}"
+                                 update=":formConsulta:tabela :formConsulta:paciente :formConsulta:medicamento"/>
+            </div>
+        </div>
+    </div>
+
+    <p:separator/>
+
+    <p:dataTable id="tabela" value="#{consultaMedicamentosBean.lazyModel}" var="r" lazy="true"
+                 paginator="true" rows="5" rowsPerPageTemplate="5,10,20,50"
+                 rowKey="#{r.receitaId}" currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords}"
+                 emptyMessage="Nenhuma receita encontrada">
+
+        <p:column headerText="ID da Receita" sortBy="#{r.receitaId}">
+            <h:outputText value="#{r.receitaId}"/>
+        </p:column>
+
+        <p:column headerText="Paciente" sortBy="#{r.pacienteNome}">
+            <h:outputText value="#{r.pacienteNome}"/>
+        </p:column>
+
+        <p:column headerText="Total de Medicamentos">
+            <p:commandLink value="#{r.totalMedicamentos}"
+                           actionListener="#{consultaMedicamentosBean.abrirItensReceita(r.receitaId)}"
+                           process="@this"
+                           update=":formConsulta:dialogItens"
+                           oncomplete="PF('dlgItensReceita').show()"/>
+        </p:column>
+
+    </p:dataTable>
+
+    <!-- Diálogo para exibir os medicamentos da receita selecionada -->
+    <p:dialog id="dialogItens" header="Medicamentos da Receita #{consultaMedicamentosBean.receitaIdParaItens}"
+              widgetVar="dlgItensReceita" modal="true" closable="true" resizable="false" width="600">
+        <p:dataTable value="#{consultaMedicamentosBean.itensDaReceita}" var="i"
+                     emptyMessage="Nenhum medicamento nesta receita">
+            <p:column headerText="ID Item">
+                <h:outputText value="#{i.id}"/>
+            </p:column>
+            <p:column headerText="Medicamento">
+                <h:outputText value="#{i.medicamento.nome}"/>
+            </p:column>
+        </p:dataTable>
+    </p:dialog>
+</h:form>
+
+</h:body>
+</html>

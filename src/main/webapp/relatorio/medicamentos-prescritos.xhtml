@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>Relatório - Medicamentos Prescritos</title>
+    <h:outputStylesheet library="primefaces" name="primeicons/primeicons.css"/>
+</h:head>
+<h:body>
+
+<h:form id="formRelatorio">
+    <p:growl id="growl" showDetail="true" life="3000"/>
+
+    <!-- Navegação -->
+    <p:button value="Menu Principal" icon="pi pi-home" outcome="/index.xhtml" styleClass="ui-button-secondary"/>
+    <p:spacer width="10"/>
+    <p:commandButton value="Atualizar" icon="pi pi-refresh" actionListener="#{relatorioMedicamentosBean.atualizar}"
+                     update=":formRelatorio:topMeds :formRelatorio:topPacs :formRelatorio:tabelaTotais"/>
+
+    <p:separator/>
+
+    <div class="ui-g">
+        <div class="ui-g-12 ui-md-6">
+            <p:panel header="Top 2 Medicamentos Mais Prescritos">
+                <p:dataTable id="topMeds" value="#{relatorioMedicamentosBean.topMedicamentos}" var="m"
+                             emptyMessage="Sem dados" rowIndexVar="topMedsVar">
+                    <p:column headerText="#">
+                        <h:outputText value="#{topMedsVar + 1}"/>
+                    </p:column>
+                    <p:column headerText="Medicamento">
+                        <h:outputText value="#{m.nome}"/>
+                    </p:column>
+                    <p:column headerText="Quantidade">
+                        <h:outputText value="#{m.quantidade}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </div>
+        <div class="ui-g-12 ui-md-6">
+            <p:panel header="Top 2 Pacientes com Mais Medicamentos">
+                <p:dataTable id="topPacs" value="#{relatorioMedicamentosBean.topPacientes}" var="p"
+                             emptyMessage="Sem dados" rowIndexVar="topPacsVar">
+                    <p:column headerText="#">
+                        <h:outputText value="#{topPacsVar + 1}"/>
+                    </p:column>
+                    <p:column headerText="Paciente">
+                        <h:outputText value="#{p.nome}"/>
+                    </p:column>
+                    <p:column headerText="Quantidade">
+                        <h:outputText value="#{p.quantidade}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </div>
+    </div>
+
+    <p:separator/>
+
+    <p:panel header="Total de Medicamentos por Paciente">
+        <p:dataTable id="tabelaTotais" value="#{relatorioMedicamentosBean.totaisPorPaciente}" var="t"
+                     paginator="true" rows="5" rowsPerPageTemplate="5,10,20,50"
+                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords}"
+                     emptyMessage="Nenhum paciente encontrado">
+            <p:column headerText="ID">
+                <h:outputText value="#{t.pacienteId}"/>
+            </p:column>
+            <p:column headerText="Paciente" sortBy="#{t.pacienteNome}">
+                <h:outputText value="#{t.pacienteNome}"/>
+            </p:column>
+            <p:column headerText="Total de Medicamentos" sortBy="#{t.total}">
+                <h:outputText value="#{t.total}"/>
+            </p:column>
+        </p:dataTable>
+    </p:panel>
+
+</h:form>
+
+</h:body>
+</html>

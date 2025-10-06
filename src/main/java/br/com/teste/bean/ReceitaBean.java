@@ -114,7 +114,8 @@ public class ReceitaBean implements Serializable {
             receita = receitaRepository.save(r);
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Receita criada com sucesso (ID: " + receita.getId() + ")", null));
-            PrimeFaces.current().ajax().update("formReceita:growl formReceita:painelItens");
+            // Atualiza o formulário inteiro para garantir que componentes condicionalmente renderizados entrem na árvore
+            PrimeFaces.current().ajax().update("formReceita");
         } catch (Exception e) {
             String msg = "Erro ao criar receita: " + e.getMessage();
             FacesContext.getCurrentInstance().addMessage(null,
@@ -132,7 +133,7 @@ public class ReceitaBean implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Medicamento adicionado (Item ID: " + item.getId() + ")", null));
             // Limpa seleção e atualiza a tabela
             medicamentoIdSelecionado = null;
-            PrimeFaces.current().ajax().update("formReceita:growl formReceita:tabelaItens formReceita:selectMedicamento");
+            PrimeFaces.current().ajax().update("formReceita:growl", "formReceita:tabelaItens", "formReceita:selectMedicamento");
         } catch (Exception e) {
             String msg = "Erro ao adicionar medicamento: " + e.getMessage();
             FacesContext.getCurrentInstance().addMessage(null,
@@ -147,7 +148,7 @@ public class ReceitaBean implements Serializable {
         receitaRepository.deleteItem(idItem);
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Item removido com sucesso", null));
-        PrimeFaces.current().ajax().update("formReceita:tabelaItens formReceita:growl");
+        PrimeFaces.current().ajax().update("formReceita:tabelaItens", "formReceita:growl");
     }
 
     /** Lista os itens atuais da receita para exibição na tabela. */
