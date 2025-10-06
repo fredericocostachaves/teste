@@ -6,9 +6,9 @@ import br.com.teste.repository.MedicamentoRepository;
 import org.primefaces.PrimeFaces;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
@@ -20,7 +20,7 @@ import java.io.Serializable;
  * - Trata mensagens de sucesso/erro e o ciclo de abrir/fechar o diálogo.
  */
 @Named
-@SessionScoped
+@ViewScoped
 public class MedicamentoBean implements Serializable {
 
     /** Repositório/EJB com operações de persistência para Medicamento */
@@ -89,10 +89,45 @@ public class MedicamentoBean implements Serializable {
     }
 
     /** Exclui um medicamento pelo ID e atualiza a tabela e o growl com feedback ao usuário. */
+    private boolean isForeignKeyViolationToItem(Throwable t) {
+        // Verifica violações de chave estrangeira (PostgreSQL 23503) e o nome da constraint fk_item_medicamento
+        if (t instanceof org.hibernate.exception.ConstraintViolationException) {
+            org.hibernate.exception.ConstraintViolationException cve = (org.hibernate.exception.ConstraintViolationException) t;
+            String sqlState = cve.getSQLException() != null ? cve.getSQLException().getSQLState() : null;
+            String constraintName = cve.getConstraintName();
+            if ("23503".equals(sqlState)) return true; // Violação de FK (PostgreSQL)
+            if (constraintName != null && constraintName.equalsIgnoreCase("fk_item_medicamento")) return true;
+            String msg = cve.getMessage();
+            if (msg != null && msg.toLowerCase().contains("fk_item_medicamento")) return true;
+        }
+        if (t instanceof java.sql.SQLIntegrityConstraintViolationException) return true;
+        if (t instanceof java.sql.SQLException) {
+            String sqlState = ((java.sql.SQLException) t).getSQLState();
+            if ("23503".equals(sqlState)) return true;
+            String msg = ((java.sql.SQLException) t).getMessage();
+            if (msg != null && msg.toLowerCase().contains("fk_item_medicamento")) return true;
+        }
+        String msg = t != null ? t.getMessage() : null;
+        if (msg != null && msg.toLowerCase().contains("fk_item_medicamento")) return true;
+        return false;
+    }
+
     public void excluir(Long id) {
-        repository.delete(id);
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Medicamento excluído com sucesso", null));
-        PrimeFaces.current().ajax().update("formLista:tabela");
+        try {
+            repository.delete(id);
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Medicamento excluído com sucesso", null));
+        } catch (Exception e) {
+            Throwable root = getRootCause(e);
+            String msg;
+            if (isForeignKeyViolationToItem(root)) {
+                msg = "Não é possível excluir medicamento vinculado a uma receita.";
+            } else {
+                msg = "Erro ao excluir medicamento: " + (root != null && root.getMessage() != null ? root.getMessage() : e.getClass().getSimpleName());
+            }
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+        }
+        PrimeFaces.current().ajax().update("formLista:tabela", "formLista:growl");
     }
 }
