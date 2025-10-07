@@ -14,7 +14,7 @@ import javax.inject.Named;
 import java.io.Serializable;
 
 /**
- * Bean de sessão responsável por orquestrar o CRUD de Paciente na camada de visão (JSF/PrimeFaces).
+ * Bean responsável por orquestrar o CRUD de Paciente na camada de visão (JSF/PrimeFaces).
  * - Mantém o objeto em edição (paciente).
  * - Fornece o LazyDataModel para paginação com PrimeFaces.
  * - Trata mensagens de sucesso/erro e o ciclo de abrir/fechar o diálogo.

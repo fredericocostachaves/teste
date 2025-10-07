@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Bean de sessão para a consulta "Medicamentos por Paciente".
+ * Bean para a consulta "Medicamentos por Paciente".
  * Mantém os filtros de pesquisa e expõe o LazyDataModel para a tabela.
  */
 @Named

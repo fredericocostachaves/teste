@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Bean de sessão para cadastro/associação de Medicamentos a uma Receita de um Paciente.
+ * Bean para cadastro/associação de Medicamentos a uma Receita de um Paciente.
  * Fluxo básico:
  * 1) Seleciona-se um Paciente e clica em "Criar Receita" (cria e persiste a receita).
  * 2) Adicionam-se um ou mais Medicamentos (cria itens de MedicamentoReceitado).
