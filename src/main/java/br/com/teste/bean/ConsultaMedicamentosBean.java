@@ -5,7 +5,7 @@ import br.com.teste.model.MedicamentoReceitado;
 import br.com.teste.repository.ReceitaRepository;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
@@ -17,7 +17,7 @@ import java.util.List;
  * Mantém os filtros de pesquisa e expõe o LazyDataModel para a tabela.
  */
 @Named
-@SessionScoped
+@ViewScoped
 public class ConsultaMedicamentosBean implements Serializable {
 
     @Inject
